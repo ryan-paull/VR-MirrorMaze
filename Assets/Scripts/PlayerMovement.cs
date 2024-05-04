@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,12 +11,16 @@ public class PlayerMovement : MonoBehaviour
     private Animator myAnimator;
     private bool isDead;
     public bool test = false;
+    private GameObject xrRig;
+    private InputData inputData;
 
     // Start is called before the first frame update
     void Start()
     {
         myRB = GetComponent<Rigidbody>();
         myAnimator = GetComponentInChildren<Animator>();
+        xrRig = GameObject.Find("XR Origin (XR Rig)");
+        inputData = xrRig.GetComponent<InputData>();
     }
 
     // Update is called once per frame
@@ -23,8 +28,16 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!isDead)
         {
+            xrRig.transform.position = transform.position + new Vector3(0f,0.8f,0f);
+
             xInput = Input.GetAxis("Horizontal");
             yInput = Input.GetAxis("Vertical");
+
+            if (inputData.rightController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 movement))
+            {
+                xInput = movement.x;
+                yInput = movement.y;
+            }
 
             myRB.velocity = new Vector3(xInput, 0, yInput);
 
